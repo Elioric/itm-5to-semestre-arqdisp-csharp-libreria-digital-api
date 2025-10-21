@@ -1,6 +1,7 @@
 version: '3.4'
 
 services:
+
   libreria-digital-api:
     image: libreria-digital-api
     container_name: libreria-digital-api 
@@ -8,16 +9,21 @@ services:
       context: ./LibreriaDigital.WebApi
       dockerfile: Dockerfile
     ports:
-      - "8980:80"
+      - "8980:8080"
     networks:
       - libreria-digital-net
+    entrypoint: ["/bin/sh", "-c", "sleep 300 && dotnet LibreriaDigital.WebApi.dll"]
+    depends_on:
+      - libreria-digital-sqlserver
+
   libreria-digital-sqlserver:
-    image: mcr.microsoft.com/mssql/server:latest 
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: libreria-digital-sqlserver 
     ports:
       - "14330:1433"
     environment:
       - SA_PASSWORD=myPass123
+      - MSSQL_SA_PASSWORD=myPass123
       - ACCEPT_EULA=Y
     networks:
       - libreria-digital-net

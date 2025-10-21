@@ -18,6 +18,14 @@ dotnet add package Microsoft.EntityFrameworkCore.Tools
 dotnet add package Microsoft.EntityFrameworkCore.Design
 dotnet add package Microsoft.AspNetCore.OpenApi
 
+# Install dotnet EntityFramework
+
+dotnet tool install --global dotnet-ef
+
+# Create Migrations
+
+dotnet ef migrations add InitialCreate --project LibreriaDigital.WebApi
+
 # Build and Get services up with docker-compose
 
 docker-compose up -d --build
@@ -26,6 +34,16 @@ docker-compose up -d --build
 
 docker-compose logs [ container-name ]
 
+# Create and update DB
+
+dotnet ef database update
+
 # Get services down
 
 docker-compose down
+
+# Execute Database with Docker alone
+
+docker run -d --rm  --name mssql-2022-server -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=myPass123' -p 1440:1433 mcr.microsoft.com/mssql/server:2022-latest
+
+docker exec -it mssql-2022-server /bin/bash

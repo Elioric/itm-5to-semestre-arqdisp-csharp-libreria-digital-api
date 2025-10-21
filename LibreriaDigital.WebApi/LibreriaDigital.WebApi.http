@@ -1,6 +1,0 @@
-@LibreriaDigital.WebApi_HostAddress = http://localhost:5244
-
-GET {{LibreriaDigital.WebApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
