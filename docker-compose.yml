@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  libreria-digital-api:
+    image: libreria-digital-api
+    container_name: libreria-digital-api 
+    build:
+      context: ./LibreriaDigital.WebApi
+      dockerfile: Dockerfile
+    ports:
+      - "8980:80"
+    networks:
+      - libreria-digital-net
+  libreria-digital-sqlserver:
+    image: mcr.microsoft.com/mssql/server:latest 
+    container_name: libreria-digital-sqlserver 
+    ports:
+      - "14330:1433"
+    environment:
+      - SA_PASSWORD=myPass123
+      - ACCEPT_EULA=Y
+    networks:
+      - libreria-digital-net
+
+networks:
+  libreria-digital-net:
+    driver: bridge
