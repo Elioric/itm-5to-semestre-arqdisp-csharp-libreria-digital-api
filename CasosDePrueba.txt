@@ -1,0 +1,69 @@
+# Create first user
+
+{
+  "name": "Elias",
+  "lastName": "Cano",
+  "email": "elias.cano@test.com",
+  "password": "Password123"
+}
+
+# Create second user
+{
+  "name": "Laura",
+  "lastName": "Gomez",
+  "email": "laura.gomez@test.com",
+  "password": "SecurePwd456"
+}
+
+# Create Book for first user
+{
+  "title": "El Señor de los Anillos",
+  "author": "J.R.R. Tolkien",
+  "year": 1954,
+  "imageLocation": "https://img.ejemplo.com/lotr.jpg",
+  "rating": 5,
+  "review": "Una épica inigualable.",
+  "userId": 1
+}
+
+# Update first user
+{
+  "name": "Elias David",
+  "lastName": "Cano",
+  "email": "elias.david@test.com",
+  "password": "Password123" 
+}
+
+# Update book of first user
+
+{
+  "title": "El Señor de los Anillos",
+  "author": "J.R.R. Tolkien",
+  "year": 1954,
+  "imageLocation": "https://img.ejemplo.com/lotr.jpg",
+  "rating": 4,
+  "review": "Excelente, pero muy extenso para mi gusto.",
+  "userId": 1
+}
+
+# Create book for second user
+{
+  "title": "Cien años de soledad",
+  "author": "Gabriel García Márquez",
+  "year": 1967,
+  "imageLocation": null,
+  "rating": 5,
+  "review": "Obra maestra de realismo mágico.",
+  "userId": 2
+}
+
+# Create book for second user
+{
+  "title": "La Biblioteca de los Nuevos Comienzos",
+  "author": "Michiko Aoyama",
+  "year": 2023,
+  "imageLocation": null,
+  "rating": 3,
+  "review": "El inicio es un poco lento, pero es una historia maravillosa",
+  "userId": 2
+}

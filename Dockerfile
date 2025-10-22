@@ -6,7 +6,13 @@ EXPOSE 443
 # Usar la imagen SDK para compilar el proyecto
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["./", "LibreriaDigital.WebApi/"]
+
+COPY *.sln .
+COPY ["./LibreriaDigital.WebApi/*.csproj", "LibreriaDigital.WebApi/"]
+COPY ["./LibreriaDigital.Application/*.csproj", "LibreriaDigital.Application/"]
+COPY ["./LibreriaDigital.Domain/*.csproj", "LibreriaDigital.Domain/"]
+COPY ["./LibreriaDigital.Infrastructure/*.csproj", "LibreriaDigital.Infrastructure/"]
+
 RUN dotnet restore "LibreriaDigital.WebApi/LibreriaDigital.WebApi.csproj"
 COPY . .
 WORKDIR "/src/LibreriaDigital.WebApi"

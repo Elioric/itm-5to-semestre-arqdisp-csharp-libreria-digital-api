@@ -6,7 +6,7 @@ services:
     image: libreria-digital-api
     container_name: libreria-digital-api 
     build:
-      context: ./LibreriaDigital.WebApi
+      context: ./
       dockerfile: Dockerfile
     ports:
       - "8980:8080"
@@ -23,7 +23,6 @@ services:
       - "14330:1433"
     environment:
       - SA_PASSWORD=myPass123
-      - MSSQL_SA_PASSWORD=myPass123
       - ACCEPT_EULA=Y
     networks:
       - libreria-digital-net

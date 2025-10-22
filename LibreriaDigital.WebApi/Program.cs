@@ -1,44 +1,47 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using LibreriaDigital.WebApi.Models;
+// using Microsoft.OpenApi.Models;
+using LibreriaDigital.Application.Interfaces;
+using LibreriaDigital.Infrastructure.Repositories; 
+using LibreriaDigital.Infrastructure.Data; 
+using LibreriaDigital.Application; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddDbContext<LibreriaDigitalAppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(MappingProfile).Assembly);
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     try
     {
-            var context = services.GetRequiredService<LibreriaDigitalAppDbContext>();
+        var context = services.GetRequiredService<LibreriaDigitalAppDbContext>();
             if (context.Database.GetPendingMigrations().Any())
             {
-                context.Database.Migrate();
+        context.Database.Migrate();
             }
     }
     catch (Exception ex)
     {
-        // Aquí puedes manejar cualquier error que pueda surgir, por ejemplo, utilizando un logger
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Un error ocurrió al aplicar las migraciones.");
     }
 }
 
-// Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
     app.UseSwagger();
@@ -46,6 +49,7 @@ using (var scope = app.Services.CreateScope())
 // }
 
 app.UseRouting();
+
 app.UseEndpoints(endpoints =>
     {
         endpoints.MapControllers();

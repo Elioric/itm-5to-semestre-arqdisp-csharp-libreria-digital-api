@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LibreriaDigital.WebApi.Models;
+using AutoMapper;
+using LibreriaDigital.Domain.Entities;
+using LibreriaDigital.Application.Interfaces;
+using LibreriaDigital.Application.DTOs;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LibreriaDigital.WebApi.Controllers
 {
@@ -13,111 +12,99 @@ namespace LibreriaDigital.WebApi.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly LibreriaDigitalAppDbContext _context;
+        private readonly IBookRepository _bookRepository;
+        private readonly IMapper _mapper;
 
-        public BooksController(LibreriaDigitalAppDbContext context)
+        // Inyección del Repositorio y AutoMapper
+        public BooksController(IBookRepository bookRepository, IMapper mapper)
         {
-            _context = context;
+            _bookRepository = bookRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Books
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+        [ProducesResponseType(typeof(IEnumerable<BookDetailsDto>), 200)]
+        public async Task<ActionResult<IEnumerable<BookDetailsDto>>> GetBooks()
         {
-          if (_context.Books == null)
-          {
-              return NotFound();
-          }
-            return await _context.Books.ToListAsync();
+            var books = await _bookRepository.GetAllAsync();
+            
+            // Mapear la lista de Entidades a DTOs de salida
+            var bookDtos = _mapper.Map<IEnumerable<BookDetailsDto>>(books);
+            
+            return Ok(bookDtos);
         }
 
         // GET: api/Books/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> GetBook(int id)
+        [ProducesResponseType(typeof(BookDetailsDto), 200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<BookDetailsDto>> GetBook(int id)
         {
-          if (_context.Books == null)
-          {
-              return NotFound();
-          }
-            var book = await _context.Books.FindAsync(id);
+            var book = await _bookRepository.GetByIdAsync(id);
 
             if (book == null)
             {
                 return NotFound();
             }
 
-            return book;
-        }
-
-        // PUT: api/Books/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutBook(int id, Book book)
-        {
-            if (id != book.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(book).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BookExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var bookDto = _mapper.Map<BookDetailsDto>(book);
+            
+            return Ok(bookDto);
         }
 
         // POST: api/Books
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(Book book)
+        [ProducesResponseType(typeof(BookDetailsDto), 201)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<BookDetailsDto>> PostBook(BookCreateDto bookDto)
         {
-          if (_context.Books == null)
-          {
-              return Problem("Entity set 'LibreriaDigitalAppDbContext.Books'  is null.");
-          }
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
+            var bookEntity = _mapper.Map<Book>(bookDto);
+            
+            await _bookRepository.AddAsync(bookEntity);
 
-            return CreatedAtAction("GetBook", new { id = book.Id }, book);
+            var createdBook = await _bookRepository.GetByIdAsync(bookEntity.Id);
+            
+            var createdBookDto = _mapper.Map<BookDetailsDto>(createdBook);
+
+            return CreatedAtAction(nameof(GetBook), new { id = createdBookDto.Id }, createdBookDto);
+        }
+
+        // PUT: api/Books/5
+        [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> PutBook(int id, BookCreateDto bookDto)
+        {
+            if (!await _bookRepository.ExistsAsync(id))
+            {
+                return NotFound();
+            }
+            
+            var bookToUpdate = _mapper.Map<Book>(bookDto);
+            
+            bookToUpdate.Id = id;
+            
+            await _bookRepository.UpdateAsync(bookToUpdate);
+
+            return NoContent();
         }
 
         // DELETE: api/Books/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            if (_context.Books == null)
-            {
-                return NotFound();
-            }
-            var book = await _context.Books.FindAsync(id);
-            if (book == null)
+            if (!await _bookRepository.ExistsAsync(id))
             {
                 return NotFound();
             }
 
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
+            await _bookRepository.DeleteAsync(id);
 
             return NoContent();
-        }
-
-        private bool BookExists(int id)
-        {
-            return (_context.Books?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

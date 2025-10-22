@@ -1,4 +1,4 @@
-namespace LibreriaDigital.WebApi.Models
+namespace LibreriaDigital.Domain.Entities
 {
     public class User
     {
@@ -7,5 +7,8 @@ namespace LibreriaDigital.WebApi.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+
+        // Propiedad de navegación
+        public ICollection<Book>? Books { get; set; } = new List<Book>();
     }
 }
